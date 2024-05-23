@@ -1,21 +1,30 @@
 #ifndef GO_HPP
 #define GO_HPP
 #include <array>
+#include <vector>
 #include <string>
 
 const int BOARDSIZE = 19;
 
-enum class Player {Empty, Black, White};
+enum class Stone {Empty, Black, White};
 
 class Go {
     public:
         Go();
-        Go(std::string sgf);
-        Player player(const int row, const int col) const;
+        Go(const std::string& name1, const std::string& name2);
+        Go(const std::string& sgf);
+        Stone stone(const int row, const int col) const;
+        void saveSgf(const std::string& sgfDir) const;
+
         static std::string sgfToStd(const std::string& sgfMove);
-        //static std::string stdToSgf(const std::string& stdMove);
     private:
-        std::array<Player, BOARDSIZE*BOARDSIZE> board;
+        std::array<Stone, BOARDSIZE*BOARDSIZE> board;
+        std::array<int, 2> captures;
+        std::vector<std::string> moves;
+        std::string player1;
+        std::string player2;
+        bool gameOver;
+
 };
 
 #endif

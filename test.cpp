@@ -10,5 +10,6 @@ int main(){
     cout << Go::sgfToStd("W[dp];") << endl;
     cout << Go::sgfToStd("B[cq];W[dq]") << endl;
     cout << Go::sgfToStd("W[dq]") << endl;
+    g.saveSgf("./sgfs");
     return 0;
 }
