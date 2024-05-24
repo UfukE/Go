@@ -65,3 +65,15 @@ std::string Go::toString(const char empty, const char black, const char white) c
     }
     return res.str();
 }
+
+bool Go::play(const int row, const int col){
+    if(gameOver)
+        return false;
+    Stone s = Stone((moves.size() % 2) + 1);
+    /*Convert move(s, row, col) -> sgf move*/
+    moves.push_back(std::string{(s==Stone::Black ? 'B' : 'W'), '[', char(col + 97), char(row + 97),']'});
+    Stone& cs = board[row * BOARDSIZE + col];
+    if (cs == Stone::Empty)
+        cs = s;
+    return true;
+}
