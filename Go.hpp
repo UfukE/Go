@@ -5,6 +5,7 @@
 #include <string>
 
 const int BOARDSIZE = 19;
+const float KOMI = 7.5;
 
 enum class Stone {Empty, Black, White};
 

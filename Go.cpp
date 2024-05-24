@@ -25,8 +25,15 @@ std::string Go::sgfToStd(const std::string& sgfMove){
 void Go::saveSgf(const std::string& sgfDir) const {
     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::ostringstream filename;
+    filename << sgfDir << '/';
     filename << player1 << "_vs_" << player2 << '_';
     filename << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S");
-    std::cout << filename.str() << std::endl;
-    //std::string filename{std::ctime(&t)};
+    std::ofstream file{filename.str()};
+    file << "(;FF[4]\nCA[UTF-8]\nGM[1]\nGN[" << filename.str().substr(sgfDir.size()+1,std::string::npos) << "]\nAP[Ufuk's Go app]\nPB["<< player1 << "]\nPW[" << player2 << "]\n";
+    file << "SZ[" << BOARDSIZE << "]\nKM[" << KOMI << "]\nRU[Chinese]\nDT[" << std::put_time(std::localtime(&t), "%Y-%m-%d") << "]\n";
+    for(std::string move : moves){
+        file << ';' << move << '\n';
+    }
+    file << ')';
+    file.close();
 }
