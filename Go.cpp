@@ -22,13 +22,17 @@ std::string Go::sgfToStd(const std::string& sgfMove){
     return std::string{sgfMove[0], ' ', (c < 105 ? (char)std::toupper(c) : (char)std::toupper(c+1))} + std::to_string(116-r);
 }
 
+void Go::saveSgf() const{
+    saveSgf(".");
+}
+
 void Go::saveSgf(const std::string& sgfDir) const {
     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::ostringstream filename;
     filename << sgfDir << '/';
     filename << player1 << "_vs_" << player2 << '_';
     filename << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S");
-    std::ofstream file{filename.str()};
+    std::ofstream file{filename.str() + ".sgf"};
     file << "(;FF[4]\nCA[UTF-8]\nGM[1]\nGN[" << filename.str().substr(sgfDir.size()+1,std::string::npos) << "]\nAP[Ufuk's Go app]\nPB["<< player1 << "]\nPW[" << player2 << "]\n";
     file << "SZ[" << BOARDSIZE << "]\nKM[" << KOMI << "]\nRU[Chinese]\nDT[" << std::put_time(std::localtime(&t), "%Y-%m-%d") << "]\n";
     for(std::string move : moves){
@@ -36,4 +40,28 @@ void Go::saveSgf(const std::string& sgfDir) const {
     }
     file << ')';
     file.close();
+}
+
+std::string Go::toString() const {
+    return toString('+', 'B', 'W');
+}
+
+std::string Go::toString(const char empty, const char black, const char white) const {
+    std::ostringstream res;
+    for(int i = 0; i < BOARDSIZE*BOARDSIZE; i++){
+        switch (board[i]){
+            case Stone::Empty:
+                res << empty;
+                break;
+            case Stone::Black:
+                res << black;
+                break;
+            case Stone::White:
+                res << white;
+                break;
+        }
+        if ((i+1) % BOARDSIZE == 0)
+            res << "\n";
+    }
+    return res.str();
 }

@@ -9,7 +9,7 @@ test: test.o Go.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f *.o $(EXEC_FILES)
+	rm -f *.o *.sgf $(EXEC_FILES)
 
 run:
 	./test.exe
