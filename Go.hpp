@@ -20,7 +20,8 @@ class Go {
         void saveSgf(const std::string& sgfDir) const;
         std::string toString() const;
         std::string toString(const char empty, const char black, const char white) const;
-        bool play(const int row, const int col);
+        bool play(std::string stdMove);
+        bool makeMove(const int row, const int col, const Stone s);
         static std::string sgfToStd(const std::string& sgfMove);
     private:
         std::array<Stone, BOARDSIZE*BOARDSIZE> board;

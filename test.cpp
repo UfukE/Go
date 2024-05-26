@@ -10,7 +10,13 @@ int main(){
     cout << Go::sgfToStd("W[dp];") << endl;
     cout << Go::sgfToStd("B[cq];W[dq]") << endl;
     cout << Go::sgfToStd("W[dq]") << endl;
-    g.play(3,15);
+    g.play("Q16");
+    cout << g.toString() << endl;
+    g.play("D16");
+    g.play("Q4");
+    g.play("D4");
+    g.play("C3");
+    g.play("D3");
     cout << g.toString() << endl;
     g.saveSgf();
     return 0;

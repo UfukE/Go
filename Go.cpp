@@ -1,6 +1,6 @@
 #include "Go.hpp"
-#include <string>
-#include <cctype> //toupper
+#include <string> //string, stoi
+#include <cctype> //toupper, tolower
 #include <iomanip> //put_time
 #include <sstream> //ostringstream
 #include <fstream> //ofstream
@@ -66,12 +66,22 @@ std::string Go::toString(const char empty, const char black, const char white) c
     return res.str();
 }
 
-bool Go::play(const int row, const int col){
+bool Go::play(std::string stdMove){
+    Stone s = Stone((moves.size() % 2) + 1); //stone to be played
+    //Convert stdMove('A-T'+'1-19' with i excluded) -> move(row, col)
+    int col = std::tolower(stdMove[0]) - 97;
+    if (col >= 8) //'i' ascii -> 105 - 97 = 8
+        col -= 1;
+    stdMove.erase(0, 1);
+    int row = 19 - std::stoi(stdMove);
+    makeMove(row, col, s);
+    return true;
+}
+
+bool Go::makeMove(const int row, const int col, const Stone s){
     if(gameOver)
         return false;
-    Stone s = Stone((moves.size() % 2) + 1);
-    /*Convert move(s, row, col) -> sgf move*/
-    moves.push_back(std::string{(s==Stone::Black ? 'B' : 'W'), '[', char(col + 97), char(row + 97),']'});
+    moves.push_back(std::string{(s==Stone::Black ? 'B' : 'W'), '[', char(col + 97), char(row + 97),']'}); //Convert move(row, col, s) -> sgf move
     Stone& cs = board[row * BOARDSIZE + col];
     if (cs == Stone::Empty)
         cs = s;
