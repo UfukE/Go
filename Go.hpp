@@ -14,7 +14,7 @@ class Go {
         Go();
         Go(const std::string& name1, const std::string& name2);
         Go(const std::string& sgf);
-        Stone stone(const int row, const int col) const;
+        inline Stone stone(const int row, const int col) const;
 
         void saveSgf() const;
         void saveSgf(const std::string& sgfDir) const;
@@ -30,6 +30,9 @@ class Go {
         std::string player1;
         std::string player2;
         bool gameOver;
+        inline bool moveInRange(const int index) const;
+        int shape(const int index, std::vector<int>& res) const;
+        void shape(const int index, std::vector<int>& res, std::vector<int>& liberties) const;
 
 };
 

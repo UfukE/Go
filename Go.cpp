@@ -6,13 +6,14 @@
 #include <fstream> //ofstream
 #include <chrono> //system_clock
 #include <ctime> //ctime()
+#include <algorithm> //find
 #include <iostream>
 
 Go::Go() : Go("Black", "White") {}
 
 Go::Go(const std::string& name1, const std::string& name2) : board{}, captures{}, player1{name1}, player2{name2}, gameOver{false} {}
 
-Stone Go::stone(const int row, const int col) const {
+inline Stone Go::stone(const int row, const int col) const {
     return board[row * BOARDSIZE + col];
 }
 
@@ -86,4 +87,28 @@ bool Go::makeMove(const int row, const int col, const Stone s){
     if (cs == Stone::Empty)
         cs = s;
     return true;
+}
+
+inline bool Go::moveInRange(const int index) const {
+    return (index >= 0) and (index < BOARDSIZE * BOARDSIZE);
+}
+
+//Given the index of a stone, this function determines which shape the stone belongs to and calculates the indices of all stones that are part of that shape, including the original stone. Also returns the liberty count of the shape.
+int Go::shape(const int index, std::vector<int>& res) const {
+    std::vector<int> libs;
+    shape(index, res, libs);
+    return libs.size();
+}
+
+void Go::shape(const int index, std::vector<int>& res, std::vector<int>& liberties) const {
+    res.push_back(index);
+    for(int i = 0; i < 4; i++){
+        int newIndex = index + (2 * (i%2) - 1) * ((BOARDSIZE-1) * (i/2) + 1); //index + (-1, +1, -BOARDSIZE, +BOARDSIZE)
+        if(moveInRange(newIndex)){
+            if (board[newIndex] == board[index] and std::find(res.begin(), res.end(), newIndex) == res.end())
+                shape(newIndex, res, liberties);
+            else if (board[newIndex] == Stone::Empty and std::find(liberties.begin(), liberties.end(), newIndex) == liberties.end())
+                liberties.push_back(newIndex);
+        }       
+    }
 }
