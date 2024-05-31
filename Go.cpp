@@ -82,10 +82,35 @@ bool Go::play(std::string stdMove){
 bool Go::makeMove(const int row, const int col, const Stone s){
     if(gameOver)
         return false;
+    int index = row * BOARDSIZE + col;
+    Stone& cs = board[index];
+    if(not moveInRange(index))
+        return false;
+    if(cs != Stone::Empty)
+        return false;
+    
+    cs = s; //place the move temporarily
+    bool doesCapture = false;
+    std::vector<int> shp{};
+    for(int i = 0; i < 4; i++){
+        int newIndex = index + (2 * (i%2) - 1) * ((BOARDSIZE-1) * (i/2) + 1); //index + (-1, +1, -BOARDSIZE, +BOARDSIZE)
+        if(moveInRange(newIndex) and int(board[newIndex]) == 3-int(s)){
+            if(shape(newIndex, shp) == 0){
+                doesCapture = true;
+                for(int cptIndex : shp){
+                    board[cptIndex] = Stone::Empty;
+                    captures[int(s)]++;
+                }
+            }
+            shp.clear();
+        }
+    }
+
+    if(not doesCapture and shape(index, shp) == 0)
+        return bool(cs = Stone::Empty); //returns false
+    //End of tests
+
     moves.push_back(std::string{(s==Stone::Black ? 'B' : 'W'), '[', char(col + 97), char(row + 97),']'}); //Convert move(row, col, s) -> sgf move
-    Stone& cs = board[row * BOARDSIZE + col];
-    if (cs == Stone::Empty)
-        cs = s;
     return true;
 }
 
