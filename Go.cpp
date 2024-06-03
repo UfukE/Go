@@ -15,7 +15,8 @@ Go::Go(const std::string& name1, const std::string& name2) : board{}, captures{}
     metaData += ("PB[" + name1 + "]\nPW[" + name2 + "]\n");
     metaData += ("SZ[" + std::to_string(BOARDSIZE) + "]\nKM[" + std::to_string(HANDICAP > 0 ? -0.5 : KOMI).substr(0, (HANDICAP > 0 ? 4 : 3)) + "]\n");
     setHandi(HANDICAP);
-    setHandiMeta(HANDICAP);
+    if (HANDICAP > 0)
+        metaData += "\n";
 }
 
 inline Stone Go::stone(const int row, const int col) const {
@@ -159,80 +160,57 @@ void Go::shape(const int index, std::vector<int>& res, std::vector<int>& liberti
     }
 }
 
-void Go::setHandiMeta(const int n) {
-    switch (n){
-        case 2:
-            metaData += "HA[" + std::to_string(n) + "]\nAB[pd][dp]";
-            break;
-        case 3:
-            setHandiMeta(2);
-            metaData += "[pp]";
-            break;
-        case 4:
-            setHandiMeta(3);
-            metaData += "[dd]";
-            break;
-        case 5:
-            setHandiMeta(4);
-            metaData += "[jj]";
-            break;
-        case 6:
-            setHandiMeta(4);
-            metaData += "[dj][pj]";
-            break;
-        case 7:
-            setHandiMeta(6);
-            metaData += "[jj]";
-            break;
-        case 8:
-            setHandiMeta(6);
-            metaData += "[jd][jp]";
-            break;
-        case 9:
-            setHandiMeta(8);
-            metaData += "[jj]";
-            break;
-        default:
-            break;
-    }
-}
-
-
-bool Go::setHandi(const int n){
+void Go::setHandi(const int n){
     if(moves.size() != 0)
-        return false;
+        return;
     switch (n){
         case 1:
             captures[0] += (KOMI + 0.5); //equivalent to komi = -0.5
-            return true;
+            break;
         case 2:
             board[3 * BOARDSIZE + 15] = Stone::Black;
             board[15 * BOARDSIZE + 3] = Stone::Black;
-            return setHandi(1);
+            metaData += "HA[" + std::to_string(HANDICAP) + "]\nAB[pd][dp]";
+            setHandi(1);
+            break;
         case 3:
             board[15 * BOARDSIZE + 15] = Stone::Black;
-            return setHandi(2);
+            setHandi(2);
+            metaData += "[pp]";
+            break;
         case 4:
             board[3 * BOARDSIZE + 3] = Stone::Black;
-            return setHandi(3);
+            setHandi(3);
+            metaData += "[dd]";
+            break;
         case 5:
             board[9 * BOARDSIZE + 9] = Stone::Black;
-            return setHandi(4);
+            setHandi(4);
+            metaData += "[jj]";
+            break;
         case 6:
             board[9 * BOARDSIZE + 3] = Stone::Black;
             board[9 * BOARDSIZE + 15] = Stone::Black;
-            return setHandi(4);
+            setHandi(4);
+            metaData += "[dj][pj]";
+            break;
         case 7:
             board[9 * BOARDSIZE + 9] = Stone::Black;
-            return setHandi(6);
+            setHandi(6);
+            metaData += "[jj]";
+            break;
         case 8:
             board[3 * BOARDSIZE + 9] = Stone::Black;
             board[15 * BOARDSIZE + 9] = Stone::Black;
-            return setHandi(6);
+            setHandi(6);
+            metaData += "[jd][jp]";
+            break;
         case 9:
             board[9 * BOARDSIZE + 9] = Stone::Black;
-            return setHandi(8);
+            setHandi(8);
+            metaData += "[jj]";
+            break;
         default:
-            return false;
+            break;
     }
 }

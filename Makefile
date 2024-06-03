@@ -13,4 +13,5 @@ clean:
 
 run:
 	./test.exe
+	cat Black_vs_White_*.sgf
 

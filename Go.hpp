@@ -24,7 +24,7 @@ class Go {
         std::string toString(const char empty, const char black, const char white) const;
         bool play(std::string stdMove);
         bool makeMove(const int row, const int col, const Stone s);
-        bool setHandi(const int n);
+        void setHandi(const int n);
         static std::string sgfToStd(const std::string& sgfMove);
     private:
         std::array<Stone, BOARDSIZE*BOARDSIZE> board;
@@ -37,7 +37,6 @@ class Go {
         inline bool moveInRange(const int index) const;
         int shape(const int index, std::vector<int>& res) const;
         void shape(const int index, std::vector<int>& res, std::vector<int>& liberties) const;
-        void setHandiMeta(const int n);
 };
 
 #endif
