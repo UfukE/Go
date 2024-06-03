@@ -4,7 +4,7 @@ using namespace std;
 
 int main(){
     Go g;
-    cout << Go::sgfToStd("B[pd]") << endl;
+    /*cout << Go::sgfToStd("B[pd]") << endl;
     cout << Go::sgfToStd("W[dd]") << endl;
     cout << Go::sgfToStd("B[pp]") << endl;
     cout << Go::sgfToStd("W[dp];") << endl;
@@ -17,6 +17,8 @@ int main(){
     g.play("D4");
     g.play("C3");
     g.play("D3");
+    cout << g.toString() << endl;
+    g.saveSgf();*/
     cout << g.toString() << endl;
     g.saveSgf();
     return 0;

@@ -4,8 +4,9 @@
 #include <vector>
 #include <string>
 
-const int BOARDSIZE = 19;
-const float KOMI = 7.5;
+constexpr int BOARDSIZE = 19;
+constexpr float KOMI = 7.5;
+constexpr int HANDICAP = 0;
 
 enum class Stone {Empty, Black, White};
 
@@ -16,12 +17,14 @@ class Go {
         Go(const std::string& sgf);
         inline Stone stone(const int row, const int col) const;
 
-        void saveSgf() const;
-        void saveSgf(const std::string& sgfDir) const;
+        bool saveSgf() const;
+        bool saveSgf(const std::string& sgfDir) const;
+        bool loadSgf(const std::string& filename);
         std::string toString() const;
         std::string toString(const char empty, const char black, const char white) const;
         bool play(std::string stdMove);
         bool makeMove(const int row, const int col, const Stone s);
+        bool setHandi(const int n);
         static std::string sgfToStd(const std::string& sgfMove);
     private:
         std::array<Stone, BOARDSIZE*BOARDSIZE> board;
@@ -29,11 +32,12 @@ class Go {
         std::vector<std::string> moves;
         std::string player1;
         std::string player2;
+        std::string metaData;
         bool gameOver;
         inline bool moveInRange(const int index) const;
         int shape(const int index, std::vector<int>& res) const;
         void shape(const int index, std::vector<int>& res, std::vector<int>& liberties) const;
-
+        void setHandiMeta(const int n);
 };
 
 #endif

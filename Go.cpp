@@ -3,7 +3,7 @@
 #include <cctype> //toupper, tolower
 #include <iomanip> //put_time
 #include <sstream> //ostringstream
-#include <fstream> //ofstream
+#include <fstream> //ofstream, ifstream
 #include <chrono> //system_clock
 #include <ctime> //ctime()
 #include <algorithm> //find
@@ -11,7 +11,12 @@
 
 Go::Go() : Go("Black", "White") {}
 
-Go::Go(const std::string& name1, const std::string& name2) : board{}, captures{}, player1{name1}, player2{name2}, gameOver{false} {}
+Go::Go(const std::string& name1, const std::string& name2) : board{}, captures{}, player1{name1}, player2{name2}, metaData{"(;FF[4]\nCA[UTF-8]\nGM[1]\nAP[Ufuk's Go app]\nRU[Chinese]\n"}, gameOver{false} {
+    metaData += ("PB[" + name1 + "]\nPW[" + name2 + "]\n");
+    metaData += ("SZ[" + std::to_string(BOARDSIZE) + "]\nKM[" + std::to_string(HANDICAP > 0 ? -0.5 : KOMI).substr(0, (HANDICAP > 0 ? 4 : 3)) + "]\n");
+    setHandi(HANDICAP);
+    setHandiMeta(HANDICAP);
+}
 
 inline Stone Go::stone(const int row, const int col) const {
     return board[row * BOARDSIZE + col];
@@ -23,24 +28,40 @@ std::string Go::sgfToStd(const std::string& sgfMove){
     return std::string{sgfMove[0], ' ', (c < 105 ? (char)std::toupper(c) : (char)std::toupper(c+1))} + std::to_string(116-r);
 }
 
-void Go::saveSgf() const{
-    saveSgf(".");
+bool Go::saveSgf() const{
+    return saveSgf(".");
 }
 
-void Go::saveSgf(const std::string& sgfDir) const {
+bool Go::saveSgf(const std::string& sgfDir) const {
     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::ostringstream filename;
     filename << sgfDir << '/';
     filename << player1 << "_vs_" << player2 << '_';
     filename << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S");
     std::ofstream file{filename.str() + ".sgf"};
-    file << "(;FF[4]\nCA[UTF-8]\nGM[1]\nGN[" << filename.str().substr(sgfDir.size()+1,std::string::npos) << "]\nAP[Ufuk's Go app]\nPB["<< player1 << "]\nPW[" << player2 << "]\n";
-    file << "SZ[" << BOARDSIZE << "]\nKM[" << KOMI << "]\nRU[Chinese]\nDT[" << std::put_time(std::localtime(&t), "%Y-%m-%d") << "]\n";
+    if(not file)
+        return false;
+    file << metaData << "GN[" << filename.str().substr(sgfDir.size()+1,std::string::npos) << "]\nDT[" << std::put_time(std::localtime(&t), "%Y-%m-%d") << "]\n";
     for(std::string move : moves){
         file << ';' << move << '\n';
     }
     file << ')';
     file.close();
+    return true;
+}
+
+bool Go::loadSgf(const std::string& filename){
+    if(moves.size() != 0)
+        return false;
+    std::ifstream file{filename};
+    if(not file)
+        return false;
+    std::string n;
+    
+    /*while(file >> n){
+        if
+    }*/
+    return true;
 }
 
 std::string Go::toString() const {
@@ -135,5 +156,83 @@ void Go::shape(const int index, std::vector<int>& res, std::vector<int>& liberti
             else if (board[newIndex] == Stone::Empty and std::find(liberties.begin(), liberties.end(), newIndex) == liberties.end())
                 liberties.push_back(newIndex);
         }       
+    }
+}
+
+void Go::setHandiMeta(const int n) {
+    switch (n){
+        case 2:
+            metaData += "HA[" + std::to_string(n) + "]\nAB[pd][dp]";
+            break;
+        case 3:
+            setHandiMeta(2);
+            metaData += "[pp]";
+            break;
+        case 4:
+            setHandiMeta(3);
+            metaData += "[dd]";
+            break;
+        case 5:
+            setHandiMeta(4);
+            metaData += "[jj]";
+            break;
+        case 6:
+            setHandiMeta(4);
+            metaData += "[dj][pj]";
+            break;
+        case 7:
+            setHandiMeta(6);
+            metaData += "[jj]";
+            break;
+        case 8:
+            setHandiMeta(6);
+            metaData += "[jd][jp]";
+            break;
+        case 9:
+            setHandiMeta(8);
+            metaData += "[jj]";
+            break;
+        default:
+            break;
+    }
+}
+
+
+bool Go::setHandi(const int n){
+    if(moves.size() != 0)
+        return false;
+    switch (n){
+        case 1:
+            captures[0] += (KOMI + 0.5); //equivalent to komi = -0.5
+            return true;
+        case 2:
+            board[3 * BOARDSIZE + 15] = Stone::Black;
+            board[15 * BOARDSIZE + 3] = Stone::Black;
+            return setHandi(1);
+        case 3:
+            board[15 * BOARDSIZE + 15] = Stone::Black;
+            return setHandi(2);
+        case 4:
+            board[3 * BOARDSIZE + 3] = Stone::Black;
+            return setHandi(3);
+        case 5:
+            board[9 * BOARDSIZE + 9] = Stone::Black;
+            return setHandi(4);
+        case 6:
+            board[9 * BOARDSIZE + 3] = Stone::Black;
+            board[9 * BOARDSIZE + 15] = Stone::Black;
+            return setHandi(4);
+        case 7:
+            board[9 * BOARDSIZE + 9] = Stone::Black;
+            return setHandi(6);
+        case 8:
+            board[3 * BOARDSIZE + 9] = Stone::Black;
+            board[15 * BOARDSIZE + 9] = Stone::Black;
+            return setHandi(6);
+        case 9:
+            board[9 * BOARDSIZE + 9] = Stone::Black;
+            return setHandi(8);
+        default:
+            return false;
     }
 }
